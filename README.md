@@ -1,4 +1,5 @@
 # Dubber.Lottery
+A Blazor WASM app.
 
 ## Run instructions
 Enter `Dubber.Lottery` subfolder then run the following command
