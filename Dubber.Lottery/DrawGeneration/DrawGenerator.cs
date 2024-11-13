@@ -3,6 +3,7 @@ namespace Dubber.Lottery.DrawGeneration;
 
 /// <summary>
 /// Performs the draw. This class contains state, so be careful with DI scope.
+/// Todo. Add ILogger<DrawGenerator> dependency and add some logging!
 /// </summary>
 internal class DrawGenerator : IDrawGenerator
 {
@@ -17,13 +18,16 @@ internal class DrawGenerator : IDrawGenerator
     /// <returns></returns>
     public IEnumerable<LotteryNumber> DrawNumbers(int numberToGenerate, int min, int max)
     {
+        // would add some logging here
+
         this.numbers.Clear();
 
         // store these for bonus ball draw
         this.min = min;
         this.max = max;
 
-        // using a SortedSet guarantees unique values. 
+        // using a SortedSet guarantees unique values.
+        // Not super-efficient, but it does the job
         while (this.numbers.Count < numberToGenerate)
         {
             // the Add method just returns false if a number already exists.
