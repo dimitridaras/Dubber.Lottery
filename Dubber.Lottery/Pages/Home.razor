@@ -1,0 +1,74 @@
+﻿@page "/"
+@using Dubber.Lottery.DrawGeneration
+
+<!-- DI injection here -->
+@inject IDrawGenerator drawGenerator
+
+<PageTitle>Lottery</PageTitle>
+
+<!-- css classes are set up to use BEM - https://en.bem.info/methodology/ (haven't got round to the actual stying yet though)-->
+<section class="home">
+    <header class="header">
+        <h1>Lottery Number Generator</h1>
+    </header>
+
+    <form class="form">
+        <button class="cta" type="button" @onclick="PerformDraw">Draw!</button>
+        <button class="cta" type="button" @onclick="DrawBonusBall">Draw bonus</button>
+
+        @if (this.errorMessage is not null)
+        {
+            <p>@this.errorMessage</p>
+        }
+    </form>
+
+    <ol class="number-list">
+        @foreach (var number in this.lotteryNumbers)
+        {
+            <!-- the inline stying is a temporary hack until the bem css classes are written -->
+            <li class="number-list__number number  @GetColourCssClass(number)" style="background-color:@number.Colour; padding: 5px; margin: 5px; display: inline-block; width: 40px; text-align: center; color: white;">
+                @number.Number
+            </li>
+        }
+    </ol>
+
+    @if (this.bonusBall is not null)
+    {
+        <p class="bonus">
+            Bonus Ball:
+            <span class="number @GetColourCssClass(this.bonusBall)" style="background-color:@bonusBall.Colour; padding: 5px; margin: 5px; display: inline-block; width: 40px; text-align: center; color: white;">
+                @this.bonusBall.Number
+            </span>
+        </p>
+    }
+</section>
+
+@code
+{
+    private IEnumerable<LotteryNumber> lotteryNumbers = new List<LotteryNumber>();
+    private LotteryNumber? bonusBall;
+    private string? errorMessage;
+
+    private void PerformDraw()
+    {
+        // The inputs can be made configurable (eg, in appsettings.json), or a form input
+        this.lotteryNumbers = this.drawGenerator.DrawNumbers(6, 1, 49);
+        this.errorMessage = null;
+        this.bonusBall = null;
+    }
+
+    private void DrawBonusBall()
+    {
+        // The inputs can be made configurable, or a form input
+        try
+        {
+            this.bonusBall = this.drawGenerator.DrawBonusBall();
+        }
+        catch (InvalidOperationException)
+        {
+            this.errorMessage = "You must perform the draw before drawing the bonus ball";
+        }
+    }
+
+    private static string GetColourCssClass(LotteryNumber number) => $"number--{number.Colour.ToString().ToLowerInvariant()}";
+}
